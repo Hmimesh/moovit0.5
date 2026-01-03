@@ -581,7 +581,7 @@ def create_simple_example():
         route=route_2,
         stop_times={
             stop_b: (8*3600+900, 8*3600+900),  # 08:15
-            stop_d: (8*3600+1500, 8*3600+15300)  # 08:25
+            stop_d: (8*3600+1500, 8*3600+153030)  # 08:25
         }
     )
 
@@ -610,9 +610,33 @@ def create_simple_example():
 
 
 if __name__ == "__main__":
-    # Run simple example
-    create_simple_example()
-
-    # Uncomment to run with real GTFS data:
-    # example_usage()
-
+    # Load GTFS data
+    loader = GTFSLoader("Data/gtfs_data/gtfs_extracted_data")
+    stops, routes, trips = loader.load_all()
+    
+    # Create RAPTOR instance
+    raptor = RAPTOR(routes, trips)
+    
+    # Get user input
+    Start = input("GTFS data loaded. Insert starting stop: ")
+    End = input("Insert ending stop: ")
+    
+    # Find matching stops
+    origin = next((s for s in stops if Start.lower() in s.name.lower()), None)
+    destination = next((s for s in stops if End.lower() in s.name.lower()), None)
+    
+    if not origin:
+        print(f"Could not find stop matching '{Start}'")
+    elif not destination:
+        print(f"Could not find stop matching '{End}'")
+    else:
+        # Query for journey
+        journey = raptor.query(origin, destination, 8*3600, max_rounds=5)
+        
+        if journey:
+            print("\n" + "="*70)
+            print("JOURNEY FOUND!")
+            print("="*70)
+            print(journey)
+        else:
+            print("\nNo journey found!")
