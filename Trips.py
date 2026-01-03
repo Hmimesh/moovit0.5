@@ -581,7 +581,7 @@ def create_simple_example():
         route=route_2,
         stop_times={
             stop_b: (8*3600+900, 8*3600+900),  # 08:15
-            stop_d: (8*3600+1500, 8*3600+153030)  # 08:25
+            stop_d: (8*3600+1500, 8*3600+1500)  # 08:25 - FIXED TYPO
         }
     )
 
@@ -608,35 +608,63 @@ def create_simple_example():
     else:
         print("\nNo journey found!")
 
-
 if __name__ == "__main__":
-    # Load GTFS data
-    loader = GTFSLoader("Data/gtfs_data/gtfs_extracted_data")
-    stops, routes, trips = loader.load_all()
-    
-    # Create RAPTOR instance
-    raptor = RAPTOR(routes, trips)
-    
-    # Get user input
-    Start = input("GTFS data loaded. Insert starting stop: ")
-    End = input("Insert ending stop: ")
-    
-    # Find matching stops
-    origin = next((s for s in stops if Start.lower() in s.name.lower()), None)
-    destination = next((s for s in stops if End.lower() in s.name.lower()), None)
-    
-    if not origin:
-        print(f"Could not find stop matching '{Start}'")
-    elif not destination:
-        print(f"Could not find stop matching '{End}'")
-    else:
-        # Query for journey
-        journey = raptor.query(origin, destination, 8*3600, max_rounds=5)
-        
-        if journey:
-            print("\n" + "="*70)
-            print("JOURNEY FOUND!")
-            print("="*70)
-            print(journey)
+    import sys
+
+    # Check if user wants to load GTFS data
+    if len(sys.argv) > 1 and sys.argv[1] == "--gtfs":
+        print("\n⚠️  WARNING: Loading full GTFS data is VERY SLOW (can take 5-10 minutes)")
+        print("This will load 7.8 million stop times into memory!\n")
+
+        confirm = input("Are you sure you want to continue? (yes/no): ")
+        if confirm.lower() != "yes":
+            print("Cancelled. Running simple example instead...\n")
+            create_simple_example()
+            sys.exit(0)
+
+        # Load GTFS data
+        print("\nLoading GTFS data (this will take several minutes)...")
+        loader = GTFSLoader("Data/gtfs_data/gtfs_extracted_data")
+        stops, routes, trips = loader.load_all()
+
+        # Create RAPTOR instance
+        print("\nInitializing RAPTOR...")
+        raptor = RAPTOR(routes, trips)
+
+        # Get user input
+        Start = input("\nGTFS data loaded. Insert starting stop: ")
+        End = input("Insert ending stop: ")
+
+        # Find matching stops
+        origin = next((s for s in stops if Start.lower() in s.name.lower()), None)
+        destination = next((s for s in stops if End.lower() in s.name.lower()), None)
+
+        if not origin:
+            print(f"Could not find stop matching '{Start}'")
+        elif not destination:
+            print(f"Could not find stop matching '{End}'")
         else:
-            print("\nNo journey found!")
+            # Query for journey
+            print(f"\nSearching for journey from {origin.name} to {destination.name}...")
+            journey = raptor.query(origin, destination, 8*3600, max_rounds=5)
+
+            if journey:
+                print("\n" + "="*70)
+                print("JOURNEY FOUND!")
+                print("="*70)
+                print(journey)
+                print("\nLegs:")
+                for i, (from_stop, to_stop, trip) in enumerate(journey.legs, 1):
+                    arr_time = trip.get_arrival_time(to_stop)
+                    dep_time = trip.get_departure_time(from_stop)
+                    print(f"  {i}. {from_stop.name} → {to_stop.name}")
+                    print(f"     Route: {trip.route.name}")
+                    print(f"     Depart: {Journey._format_time(dep_time)}")
+                    print(f"     Arrive: {Journey._format_time(arr_time)}")
+            else:
+                print("\nNo journey found!")
+    else:
+        # Run simple example by default
+        print("\n💡 TIP: To load real GTFS data, run: python Trips.py --gtfs")
+        print("   (Warning: This is very slow!)\n")
+        create_simple_example()
