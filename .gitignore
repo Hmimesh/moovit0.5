@@ -3,3 +3,4 @@ logs/
 __pycache__/
 gtfs_data/
 raptor/
+venv/pyvenv.cfg
