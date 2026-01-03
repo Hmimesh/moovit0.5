@@ -26,10 +26,10 @@ date = 20260104 #YYYYMMDD
 
 weekDay = pd.to_datetime(str(date)).day_name().lower()
 
-activeServices = calendar[
+active_services = calendar[
     (calendar['start_date'] <= date)&
     (calendar['end_date'] >= date)&
     (calendar[weekDay] == 1)
 ]['service_id']
 
-print(len(activeServices))
+trips_today = trips[trips['service_id'].isin(active_services['service_id'])]
