@@ -1,15 +1,30 @@
-# Israeli Public Transit RAPTOR
+# Israeli Public Transit RAPTOR (Hackathon Project)
 
-This project uses the RAPTOR (Rapid Access to Public Transport Operations Research) algorithm to find optimal routes in Israeli public transportation using real GTFS data from the Israeli Ministry of Transport.
+This repository is a **17-hour hackathon experiment**. We set out to build a route planner for Israeli public transit using real GTFS data, but we **did not finish a working solution**. What we did gain was a crash course in transit routing algorithms and a better understanding of RAPTOR.
+
+## What actually happened
+
+- **Hours 0–4:** We tried to implement **A\*** from scratch. It didn’t work for us (we struggled with modeling transit schedules and transfers correctly).
+- **Hours 4–17:** We researched alternatives and found **RAPTOR**. We then tried to wire it up to Israeli GTFS data and see meaningful results, but we didn’t get to a fully working end-to-end route planner in time.
+
+So: this project is **incomplete**, but it captures what we explored and learned during the hackathon.
 
 ## What is RAPTOR?
 
-RAPTOR is a fast algorithm for finding the best public transit routes. It can:
+RAPTOR (Rapid Access to Public Transport Operations Research) is a public transit routing algorithm that works on stop times instead of graph edges. In theory, it can:
 - Find the **fastest route** from A to B
 - Find **multiple good options** within a time window
 - Optimize for **multiple criteria** (time, fare, number of transfers)
 
-## Quick Start
+## What you’ll find in this repo
+
+- Scripts to **download Israeli GTFS data**
+- Example commands to **experiment with pyraptor**
+- Notes that reflect our attempt to get RAPTOR working during the hackathon
+
+⚠️ **Important:** This repo is not a polished project. Expect rough edges, missing pieces, and broken flows.
+
+## Quick Start (If You Want to Explore)
 
 ### 1. Install Dependencies
 
@@ -42,13 +57,13 @@ python -m pyraptor.gtfs.timetable -d "20260103" -a "ALL" --icd
 ```
 
 **Parameters:**
-- `-d` = Date (YYYYMMDD format) - use today's date or a recent date
+- `-d` = Date (YYYYMMDD format) - use today’s date or a recent date
 - `-a` = Agency - use "ALL" for all Israeli operators, or specific operator names
 - `--icd` = Include calendar dates
 
-### 5. Query Routes
+### 5. Query Routes (If You Get This Far)
 
-Once the timetable is built, you can query routes:
+Once the timetable is built, you can try queries like:
 
 #### Simple Query (Single Best Route)
 ```bash
@@ -70,28 +85,6 @@ python -m pyraptor.query_mcraptor -or "Tel Aviv" -d "Jerusalem" -t "08:30:00"
 python -m pyraptor.query_range_mcraptor -or "Tel Aviv" -d "Jerusalem" -st "08:00:00" -et "09:00:00"
 ```
 
-## Understanding the Algorithms
-
-### RAPTOR
-- **What it does:** Finds ONE journey with the earliest arrival time
-- **Use when:** You just want the fastest route
-- **Example:** "Get me to work as fast as possible"
-
-### Range RAPTOR (rRAPTOR)
-- **What it does:** Finds MULTIPLE good journeys across a time window
-- **Use when:** You want options to choose from
-- **Example:** "Show me all good options between 8-9 AM"
-
-### McRAPTOR
-- **What it does:** Finds Pareto-optimal journeys considering time, fare, and transfers
-- **Use when:** You want to balance speed, cost, and convenience
-- **Example:** "I don't mind a slightly longer trip if it's cheaper or has fewer transfers"
-
-### Range McRAPTOR (rMcRAPTOR)
-- **What it does:** Combines both - multiple criteria across a time window
-- **Use when:** You want the most comprehensive set of options
-- **Example:** "Show me all reasonable options considering time, cost, and transfers"
-
 ## Project Structure
 
 ```
@@ -104,21 +97,11 @@ python -m pyraptor.query_range_mcraptor -or "Tel Aviv" -d "Jerusalem" -st "08:00
 └── src/                 # Your custom code goes here
 ```
 
-## Common Issues
+## Why this repo exists
 
-### "No module named pyraptor.gtfs.timetable"
-- Make sure you installed pyraptor: `pip install pyraptor`
-- Check installation: `python -c "import pyraptor; print(pyraptor.__file__)"`
+We built this during a hackathon to learn, experiment, and try to build something ambitious in a short amount of time. It didn’t become a full product, but it **was valuable as a learning experience**.
 
-### "Can't push to GitHub - files too big"
-- The GTFS data files are large and should NOT be committed to git
-- They are already in `.gitignore` as `Data/` and `*.zip`
-- Only commit your code, not the data
-
-### "Timetable build is slow"
-- This is normal! Processing 400MB+ of transit data takes time
-- The Israeli GTFS dataset is very large (all operators nationwide)
-- Consider using a specific operator with `-a "operator_name"` instead of "ALL"
+If you want a complete and maintained RAPTOR project, check the references below.
 
 ## References
 
