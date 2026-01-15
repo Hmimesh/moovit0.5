@@ -22,7 +22,7 @@ RAPTOR (Rapid Access to Public Transport Operations Research) is a public transi
 - Example commands to **experiment with pyraptor**
 - Notes that reflect our attempt to get RAPTOR working during the hackathon
 
-⚠️ **Important:** This repo is not a polished project. Expect rough edges, missing pieces, and broken flows.
+**Important:** This repo is not a polished project. Expect rough edges, missing pieces, and broken flows.
 
 ## Quick Start (If You Want to Explore)
 
